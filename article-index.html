@@ -5,8 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Index - Bible Study Blog</title>
     <style>
+        :root { --bg: #fff; --fg: #000; }
+        :root.dark { --bg: #121212; --fg: #e8e8e8; color-scheme: dark; }
+        body { background: var(--bg); color: var(--fg); }
+        :root.dark a { color: #8ab4f8; }
         h2 { text-align: center; }
     </style>
+    <script>
+        (function () {
+            var mq = window.matchMedia("(prefers-color-scheme: dark)");
+            function apply() {
+                var saved = null;
+                try { saved = localStorage.getItem("theme"); } catch (e) {}
+                var hour = new Date().getHours();
+                var night = hour >= 19 || hour < 6;
+                document.documentElement.classList.toggle("dark", saved ? saved === "dark" : (night || mq.matches));
+            }
+            function scheduleNext() {
+                var now = new Date(), next = new Date(now), h = now.getHours();
+                next.setMinutes(0, 0, 0);
+                if (h < 6) next.setHours(6);
+                else if (h < 19) next.setHours(19);
+                else { next.setDate(next.getDate() + 1); next.setHours(6); }
+                setTimeout(function () { apply(); scheduleNext(); }, next - now);
+            }
+            apply();
+            scheduleNext();
+            mq.addEventListener("change", apply);
+            document.addEventListener("visibilitychange", apply);
+        })();
+    </script>
 </head>
 
 <body>
